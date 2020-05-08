@@ -69,6 +69,7 @@ class ApiParserService {
   static async parseApi(apiParser: IApiParser) {
     for (let page = apiParser.pageStart; page < apiParser.pageEnd; page++) {
       const parsedPageData = await this.parseSinglePage(apiParser, page);
+      if (!parsedPageData.length) return 'Success';
       try {
         await ProductModel.collection.insertMany(parsedPageData, {
           ordered: false,
