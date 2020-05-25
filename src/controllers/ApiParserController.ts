@@ -7,6 +7,7 @@ class ApiParserController {
   public basePath = '/apiParser';
   public requireAuth = true;
   private router = Router();
+
   constructor() {
     this.router.post('/new-request', this.createNewApiParserRequest);
     this.router.post('/approve', this.approveApiParser);
@@ -27,6 +28,8 @@ class ApiParserController {
 
   private async approveApiParser(req: Request, res: Response) {
     const userId = req['userId'];
+    console.log(userId, 'userId');
+
     const user = await UserModel.findOne({ _id: userId });
     if (!user.isAdmin) {
       return res.status(403).send('Permission denied!');

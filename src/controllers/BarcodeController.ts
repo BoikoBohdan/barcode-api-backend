@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
+import { pathOr } from 'ramda';
 import { barcodeModel } from '../models/barcode/barcode.model';
 import { BarcodeService } from '../services/barcodeService';
+import { ProductModel } from '../models/product/product.model';
 
 class BarcodeController {
   public basePath = '/barcode';
@@ -9,8 +11,22 @@ class BarcodeController {
 
   constructor() {
     this.router.get('', this.getProduct);
+    this.router.get('/all', this.getBarcodesList);
     this.router.get('/not-completed', this.getNotCompletedBarcodes);
     this.router.post('/request-for-new', this.createRequestForNewBarcode);
+  }
+
+  private async getBarcodesList(req: Request, res: Response) {
+    const page = pathOr(1, ['query', 'page'], req);
+    const perPage = pathOr(10, ['query', 'perPage'], req);
+    const skipNum = page * perPage - perPage;
+    console.log(skipNum, page, perPage);
+    const barcodesList = await ProductModel.find().skip(skipNum).limit(perPage);
+    return res.send({
+      content: barcodesList,
+      page,
+      perPage,
+    });
   }
 
   private async getProduct(req: Request, res: Response) {
